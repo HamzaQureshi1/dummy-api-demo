@@ -7,6 +7,19 @@ const { check, validationResult } = require('express-validator');
 const app = express();
 const port = process.env.PORT || 5000;
 
+const { performance } = require('perf_hooks');
+
+app.use((req, res, next) => {
+  const start = performance.now();
+  
+  res.on('finish', () => {
+    const duration = performance.now() - start;
+    console.log(`🕒 ${req.method} ${req.originalUrl} - ${duration.toFixed(2)}ms`);
+  });
+
+  next();
+});
+
 // Redis client setup
 const client = redis.createClient();
 client.on('error', (err) => console.error('Redis Error:', err));
